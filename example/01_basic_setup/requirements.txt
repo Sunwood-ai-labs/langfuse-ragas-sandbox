@@ -1,0 +1,15 @@
+langfuse==2.10.0
+datasets==2.17.0
+faiss-cpu==1.8.0
+loguru==0.7.2
+llama-index==0.10.0
+numpy==1.26.3
+openai==1.12.0
+pandas==2.2.0
+python-dotenv==1.0.1
+ragas
+sentence-transformers==2.3.1
+torch==2.2.0
+tqdm==4.66.1
+transformers==4.37.2
+chromadb==0.4.22
