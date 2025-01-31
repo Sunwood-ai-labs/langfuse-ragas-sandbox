@@ -182,14 +182,25 @@ async def evaluate_with_model(model_name: str, eval_dataset: Dataset, metrics, l
         )
 
         # 回答の生成
-        answer = chain.invoke(
-            sample["question"],
-            config={
-                "run_id": trace_id,
-                "callbacks": [handler],
-                "metadata": {"ground_truth": sample["ground_truths"][0]},
+        # Langfuseトレースの作成
+        trace = langfuse.trace(
+            id=trace_id,
+            name=f"RAG Evaluation - {model_name}",
+            metadata={
+                "model": model_name,
+                "question": sample["question"],
+                "ground_truth": sample["ground_truths"][0]
             }
         )
+
+        # トレース内でチェーンを実行
+        with trace:
+            answer = chain.invoke(
+                sample["question"],
+                config={
+                    "callbacks": [handler],
+                }
+            )
 
         logger.info(f"質問: {sample['question']}")
         logger.info(f"回答: {answer}")
@@ -221,10 +232,13 @@ async def evaluate_with_model(model_name: str, eval_dataset: Dataset, metrics, l
 
     # 全体の平均スコアを計算
     avg_scores = {}
-    for metric_name in metrics[0].name:  # 最初のメトリクスの名前を使用
+    # 各メトリクスの名前を使用して平均を計算
+    metric_names = [metric.name for metric in metrics]
+    for metric_name in metric_names:
         scores = [sample_scores.get(metric_name, 0) for sample_scores in results.values()]
-        avg_scores[metric_name] = sum(scores) / len(scores)
-        logger.success(f"{model_name} - 平均{metric_name}: {avg_scores[metric_name]}")
+        if scores:  # スコアが存在する場合のみ平均を計算
+            avg_scores[metric_name] = sum(scores) / len(scores)
+            logger.success(f"{model_name} - 平均{metric_name}: {avg_scores[metric_name]}")
 
     return avg_scores
 
