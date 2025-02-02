@@ -69,7 +69,7 @@ async def main():
         embeddings = OpenAIEmbeddings()
         metrics = setup_ragas_evaluator(llm, embeddings)
         
-        await evaluate_with_model(model_name, eval_dataset, metrics, langfuse, embeddings)
+        await evaluate_with_model(model_name, eval_dataset, metrics, langfuse, embeddings, llm)
     
     logger.success("すべての評価プロセスが完了")
 
