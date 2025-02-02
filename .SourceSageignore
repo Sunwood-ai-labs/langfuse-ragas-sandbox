@@ -24,7 +24,6 @@ sourcesage.egg-info
 dist
 build
 .env
-example
 
 .gaiah.md
 .Gaiah.md
